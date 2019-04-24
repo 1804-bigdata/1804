@@ -1,0 +1,22 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script>
+        function btnSearch() {
+            var keyword = document.getElementById("keyw").value;
+            window._AE_.searchEvent(keyword);
+        }
+        function addCart() {
+            var pid=document.getElementById("img001").getAttribute("data-sn")
+            window._AE_.addCartEvent(pid);
+        }
+    </script>
+    <script src="tracker.js"></script>
+</head>
+<body>
+<input type="text" id="keyw" style="width: 500px;"><input type="button" value="搜索" onclick="btnSearch()">
+<img src="1.jpg" style="width: 50%;height: 50%" data-sn="001" id="img001"><input type="button" value="加入购物车" onclick="addCart()">
+</body>
+</html>
