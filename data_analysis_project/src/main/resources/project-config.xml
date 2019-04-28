@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+    <property>
+        <name>ip.rule.data.path</name>
+        <value>/home/ip.txt</value>
+    </property>
+
+    <property>
+        <name>log.path.prefix</name>
+        <value>/logs/</value>
+    </property>
+
+</configuration>
