@@ -1,7 +1,8 @@
 package common
 
 import java.net.URLDecoder
-import bean.IPRule
+
+import bean.caseclass.IPRule
 import constants.LogConstants
 import org.apache.commons.lang3.StringUtils
 

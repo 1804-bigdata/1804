@@ -8,9 +8,10 @@ import org.apache.hadoop.conf.Configuration
   * 操作配置文件
   */
 object ConfigurationManager {
-  private val configuration = new Configuration()
+    private val configuration = new Configuration()
   //加载配置文件
   configuration.addResource("project-config.xml")
+  configuration.addResource("mysql-site.xml")
 
   def getvalue(key: String) = {
     configuration.get(key)

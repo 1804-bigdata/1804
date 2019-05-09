@@ -1,7 +1,7 @@
 package common
 
 import Util.Utils
-import bean.{IPRule, RegionInfo}
+import bean.caseclass.{IPRule, RegionInfo}
 
 import scala.util.control.Breaks._
 

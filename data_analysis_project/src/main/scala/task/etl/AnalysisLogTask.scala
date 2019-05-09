@@ -1,7 +1,7 @@
-package etl
+package task.etl
 
 import Util.Utils
-import bean.IPRule
+import bean.caseclass.IPRule
 import common.Analysislog
 import config.ConfigurationManager
 import constants.{GlobalConstants, LogConstants}
@@ -20,33 +20,9 @@ import scala.collection.mutable
   * Created by Administrator on 2019/4/25.
   */
 object AnalysisLogTask extends BaseTask {
-  var inputDate: String = null
+
   var inputPath: String = null
 
-  /**
-    * 验证参数是否正确
-    * 验证参数的个数>1
-    * 验证参数的格式 yyyy-MM-dd
-    *
-    * @param args
-    */
-  def validateInputArgs(args: Array[String]) = {
-    if (args.length == 0) {
-      throw new SparkException(
-        """
-          |Usage:com.daoke360.task.etl.AnalysisLogTask
-          |errorMessage:任务至少需要有一个日期参数
-        """.stripMargin)
-    }
-    if (!Utils.validateInputDate(args(0))) {
-      throw new SparkException(
-        """
-          |Usage:com.daoke360.task.etl.AnalysisLogTask
-          |errorMessage:，任务第一个参数是一个日期日期的格式是：yyyy-MM-dd
-        """.stripMargin)
-    }
-    inputDate = args(0)
-  }
 
   /**
     *2.验证当天是否存在日志信息
@@ -54,14 +30,14 @@ object AnalysisLogTask extends BaseTask {
     * 2019-04-26===Long类型时间戳===>2019/04/26==>/logs/2019/04/26==>验证这个路径在hdfs上是否存在
     */
   def validateExistsLog() = {
-   inputPath= ConfigurationManager.getvalue(GlobalConstants.CONFIG_LOG_PATH_PREFIX) + Utils.formatDate(Utils.parseDate(inputDate, "yyyy-MM-dd"), "yyyy/MM/dd")
+    inputPath = ConfigurationManager.getvalue(GlobalConstants.CONFIG_LOG_PATH_PREFIX) + Utils.formatDate(Utils.parseDate(inputDate, "yyyy-MM-dd"), "yyyy/MM/dd")
     var fileSystem: FileSystem = null
     try {
       fileSystem = FileSystem.newInstance(configuration)
       if (!fileSystem.exists(new Path(inputPath))) {
         throw new SparkException(
           s"""
-             |Usage:com.daoke360.task.etl.AnalysisLogTask
+             |Usage:etl.AnalysisLogTask
              |errorMessage:指定的日期${inputDate},不存在需要解析的用户行为日志
          """.stripMargin
         )
@@ -96,7 +72,7 @@ object AnalysisLogTask extends BaseTask {
       * 可以降低网络流量消耗，降低executor内存消耗，加快spark作用运行效率，降低失败概率
       */
     val iPRulesBroadcast = sc.broadcast(ipRuleArray)
-    val logrdd = sc.textFile(inputPath,2).map(logtext => {
+    val logrdd = sc.textFile(inputPath, 2).map(logtext => {
       Analysislog.analysisLog(logtext, iPRulesBroadcast.value)
     }).filter(x =>
       if (x != null) {
@@ -130,16 +106,16 @@ object AnalysisLogTask extends BaseTask {
   }
 
   def main(args: Array[String]): Unit = {
-    //todo 1,验证参数是否正确
+    // 1,验证参数是否正确
     validateInputArgs(args)
-    //todo 2,验证当天是否存在用户行为日志
+    // 2,验证当天是否存在用户行为日志
     validateExistsLog()
-    //todo 3,使用spark加载ip规则
+    // 3,使用spark加载ip规则
     val ipRuleArray = loadIPRule()
-    //todo 4,使用spark加载用户行为日志，进行解析
+    // 4,使用spark加载用户行为日志，进行解析
     val logrdd = loadLogFromHdfs(ipRuleArray)
     logrdd.cache()
-    //todo 5,将解析好的日志，保存到hbase上
+    // 5,将解析好的日志，保存到hbase上
     saveLogToHbase(logrdd)
     sc.stop()
   }

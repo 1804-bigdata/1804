@@ -1,4 +1,4 @@
-package bean
+package bean.caseclass
 
 import constants.GlobalConstants
 
